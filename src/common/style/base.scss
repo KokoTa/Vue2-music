@@ -1,8 +1,7 @@
-@import './variable.scss';
-
-html, body {
+html, body, #app {
   height: 100%;
   width: 100%;
+  overflow: hidden;
   user-select: none;
   background: $color-background;
   -webkit-tap-highlight-color: transparent; // 当用户点击iOS的Safari浏览器中的链接或JavaScript的可点击的元素时，覆盖显示的高亮颜色
@@ -17,4 +16,14 @@ li {
 
 a {
   text-decoration: none;
+}
+
+// 首页轮播图的按钮颜色
+.bullet {
+  background: $color-theme-d;
+  opacity: 1;
+}
+.bullet-active {
+  background: $color-theme;
+  opacity: 1;
 }

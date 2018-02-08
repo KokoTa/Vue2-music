@@ -1,0 +1,6 @@
+// 每个组件都引入一遍太麻烦了
+// 可以利用sass-resources-loader来使文件提前全局引入
+// 详情：https://vue-loader.vuejs.org/en/configurations/pre-processors.html
+// 讨论：https://github.com/vuejs/vue-loader/issues/328
+@import './variable.scss';
+@import './mixin.scss';

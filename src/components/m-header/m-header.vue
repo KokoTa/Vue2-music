@@ -2,9 +2,9 @@
   <header class="m-header">
     <h1 class="m-header-text">Music Player</h1>
     <router-link
-    tag="div"
-    class="m-header-icon"
-    to="/user">
+      tag="div"
+      class="m-header-icon"
+      to="/user">
       <i class="fa fa-user"></i>
     </router-link>
   </header>
