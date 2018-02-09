@@ -1,39 +1,50 @@
 <template>
   <article class="recommend">
-    <slider :sliderUpdate="sliderUpdate">
-      <div class="swiper-slide"
-        v-for="(item, index) in banners"
-        :key="index">
-        <img class="banner-img" :src="item.pic" alt="#">
+    <!-- scroll作为总内容的外部包裹层 -->
+    <scroll class="scroll" ref="scroll" :data="recommends">
+      <!-- scroll-conetnt作为总内容 -->
+      <div class="scroll-content">
+        <slider :sliderUpdate="sliderUpdate">
+          <div class="swiper-slide"
+            v-for="(item, index) in banners"
+            :key="index">
+            <img class="banner-img" v-lazy="item.pic" alt="#">
+          </div>
+        </slider>
+        <div class="recommend-list">
+          <h1>精品歌单推荐</h1>
+          <ul class="list-content">
+            <li class="list-item"
+              v-for="(item, index) in recommends"
+              :key="index">
+              <div class="item-icon">
+                <img v-lazy="item.coverImgUrl" alt="#">
+              </div>
+              <div class="item-text">
+                <h2 class="name">{{ item.name }}</h2>
+                <p class="desc">{{ item.description }}</p>
+              </div>
+            </li>
+          </ul>
+        </div>
       </div>
-    </slider>
-    <div class="recommend-list">
-      <h1>精品歌单推荐</h1>
-      <ul class="list-content">
-        <li class="list-item"
-          v-for="(item, index) in recommends"
-          :key="index">
-          <div class="item-icon">
-            <img :src="item.coverImgUrl" alt="#">
-          </div>
-          <div class="item-text">
-            <h2 class="name">{{ item.name }}</h2>
-            <p class="desc">{{ item.description }}</p>
-          </div>
-        </li>
-      </ul>
-    </div>
+    </scroll>
+    <loading v-show="loading"></loading>
   </article>
 </template>
 
 <script>
 import api from '@/api/api';
 import Slider from '@/base/slider/slider';
+import Loading from '@/base/loading/loading';
+import Scroll from '@/base/scroll/scroll';
 
 export default {
   name: 'recommend',
   components: {
     Slider,
+    Loading,
+    Scroll,
   },
   data() {
     return {
@@ -41,6 +52,14 @@ export default {
       sliderUpdate: false,
       recommends: [],
     };
+  },
+  computed: {
+    loading() {
+      if (!this.banners.length && !this.recommends.length) {
+        return true;
+      }
+      return false;
+    },
   },
   methods: {
     getBanner() {
@@ -50,8 +69,6 @@ export default {
             this.banners = res.data.banners;
             this.sliderUpdate = true;
             console.log(this.banners);
-          } else {
-            console.log('Bad request');
           }
         });
     },
@@ -61,6 +78,7 @@ export default {
           if (res.data.code === 200) {
             this.recommends = res.data.playlists;
             console.log(res.data);
+            this.$refs.scroll.refresh(); // 更新scroll组件高度
           }
         });
     },
@@ -74,8 +92,12 @@ export default {
 
 <style lang="scss" scoped>
 .recommend {
+  position: relative;
   height: calc(100% - 2.133333rem);
-  overflow-y: scroll;
+  .scroll {
+    height: 100%;
+    overflow: hidden;
+  }
   .banner-img {
     width: 100%;
   }
@@ -116,6 +138,10 @@ export default {
         }
       }
     }
+  }
+  .loading {
+    height: 20px;
+    width: 20px;
   }
 }
 </style>
