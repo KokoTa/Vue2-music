@@ -5,6 +5,7 @@
 </template>
 
 <script>
+// https://ustbhuangyi.github.io/better-scroll/doc/zh-hans/options.html#probetype
 import BScroll from 'better-scroll';
 
 export default {
@@ -51,36 +52,22 @@ export default {
         click: this.click,
       });
 
-      if (this.listenScroll) {
+      if (this.listenScroll) { // 是否允许监听scroll事件
         const me = this;
         this.scroll.on('scroll', (pos) => {
           me.$emit('scroll', pos);
         });
       }
-
-      if (this.pullup) {
-        this.scroll.on('scrollEnd', () => {
-          if (this.scroll.y <= this.scroll.maxScrollY + 50) {
-            this.$emit('scrollToEnd');
-          }
-        });
-      }
-
-      if (this.beforeScroll) {
-        this.scroll.on('beforeScrollStart', () => {
-          this.$emit('beforeScroll');
-        });
-      }
-    },
-    disable() {
-      this.scroll.disable();
-    },
-    enable() {
-      this.scroll.enable();
     },
     refresh() {
-      console.log('refresh');
-      this.scroll.refresh();
+      if (this.scroll.refresh) this.scroll.refresh();
+      console.log('滚动组件已更新');
+    },
+    scrollToElement(dom) {
+      if (this.scroll.scrollToElement) this.scroll.scrollToElement(dom);
+    },
+    scrollTo(dom) {
+      if (this.scroll.scrollTo) this.scroll.scrollTo(dom);
     },
   },
   watch: {

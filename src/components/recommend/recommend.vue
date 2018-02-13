@@ -1,6 +1,6 @@
 <template>
   <article class="recommend">
-    <!-- scroll作为总内容的外部包裹层 -->
+    <!-- scroll作为总内容的外部包裹层, :data监听数据变化来刷新scroll高度 -->
     <scroll class="scroll" ref="scroll" :data="recommends">
       <!-- scroll-conetnt作为总内容 -->
       <div class="scroll-content">
@@ -12,7 +12,7 @@
           </div>
         </slider>
         <div class="recommend-list">
-          <h1>精品歌单推荐</h1>
+          <h1>歌单推荐</h1>
           <ul class="list-content">
             <li class="list-item"
               v-for="(item, index) in recommends"
@@ -68,7 +68,6 @@ export default {
           if (res.data.code === 200) {
             this.banners = res.data.banners;
             this.sliderUpdate = true;
-            console.log(this.banners);
           }
         });
     },
@@ -77,8 +76,9 @@ export default {
         .then((res) => {
           if (res.data.code === 200) {
             this.recommends = res.data.playlists;
-            console.log(res.data);
-            this.$refs.scroll.refresh(); // 更新scroll组件高度
+            this.$nextTick(() => {
+              this.$refs.scroll.refresh(); // 更新scroll组件高度
+            });
           }
         });
     },

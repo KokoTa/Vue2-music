@@ -42,7 +42,7 @@ export default {
         bulletActiveClass: 'bullet-active',
       },
       autoplay: true,
-      effect: 'fade',
+      loop: true,
     });
   },
 };
@@ -52,7 +52,6 @@ export default {
 .slider {
   width: 100%; // 不设置高度，让图片把它撑开
   background: $color-background;
-  overflow: hidden;
   .swiper-container {
     width: 100%;
     height: 100%;
