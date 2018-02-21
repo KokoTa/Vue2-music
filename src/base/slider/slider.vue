@@ -1,4 +1,5 @@
 <template>
+  <!-- Base by swiper -->
   <section class="slider">
     <div class="swiper-container">
       <div class="swiper-wrapper">
@@ -39,10 +40,12 @@ export default {
       pagination: {
         el: '.swiper-pagination',
         clickable: true,
-        bulletActiveClass: 'bullet-active',
+        // bulletActiveClass: 'bullet-active', // 无效，会被 .swiper-pagination-bullet 屏蔽
       },
-      autoplay: true,
-      loop: true,
+      autoplay: {
+        delay: 5000,
+        disableOnInteraction: false, // 操作后是否停止自动切换
+      },
     });
   },
 };
@@ -51,10 +54,5 @@ export default {
 <style lang="scss" scoped>
 .slider {
   width: 100%; // 不设置高度，让图片把它撑开
-  background: $color-background;
-  .swiper-container {
-    width: 100%;
-    height: 100%;
-  }
 }
 </style>
