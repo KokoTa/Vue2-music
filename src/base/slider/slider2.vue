@@ -5,6 +5,11 @@
       <slot></slot>
     </div>
     <div class="dots">
+      <span class="dot"
+      v-for="(item, index) in dots"
+      :key="index"
+      :class="{ active: currentPageIndex === index }">
+      </span>
     </div>
   </section>
 </template>
@@ -30,16 +35,18 @@ export default {
   },
   data() {
     return {
-      dots: [],
-      currentPageIndex: 0,
-      isResize: false,
-      children: [],
-      slider: null,
+      dots: [], // 点集合
+      currentPageIndex: 0, // 当前页
+      children: [], // 子元素集合
+      slider: null, // slider实例
+      childLength: 0, // 一开始的子元素长度
+      timer: null, // 自动播放定时器
     };
   },
   methods: {
-    setSliderWidth() { // 初始化或更新slider-group的宽度
+    setSliderWidth(isResize) { // 初始化或更新slider-group的宽度；isResize判断是否更改了分辨率
       this.children = this.$refs['slider-group'].children; // 获得子元素
+      this.childLength = this.children.length;
 
       let width = 0;
       const sliderWidth = this.$refs.slider.clientWidth; // slider可视宽度
@@ -50,7 +57,7 @@ export default {
         width += sliderWidth;
       }
 
-      if (this.loop && !this.isResize) { // 如果是循环播放，则需要多两个dom来存放视差图（轮播原理）
+      if (this.loop && !isResize) { // 如果是循环播放，则需要多两个dom来存放视差图（轮播原理）; resize的时候不需要添加dom
         width += 2 * sliderWidth;
       }
 
@@ -66,15 +73,42 @@ export default {
           loop: true,
           threshold: 0.3,
           speed: 1000,
-          click: true,
+          click: true, // 点击跳转时有可能与fastclick产生冲突，删除这个就好了
         },
       });
+
+      this.slider.on('scrollEnd', () => {
+        const pageIndex = this.slider.getCurrentPage().pageX;
+        this.currentPageIndex = pageIndex;
+      });
+    },
+    initDots() {
+      this.dots = new Array(this.childLength);
+    },
+    play() {
+      this.timer = setInterval(() => {
+        this.slider.goToPage(this.currentPageIndex + 1, 0, 400);
+      }, this.interval);
     },
   },
   mounted() {
     this.$nextTick(() => {
       this.setSliderWidth();
       this.initSlider();
+      this.initDots();
+
+      if (this.autoPlay) {
+        this.play();
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      if (!this.slider) { // 如果还未初始化，就跳过
+        return false;
+      }
+      this.setSliderWidth(true);
+      this.slider.refresh();
+      return true;
     });
   },
 };
@@ -94,6 +128,26 @@ export default {
       text-align: center;
       img {
         width: 100%;
+      }
+    }
+  }
+  .dots {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: .32rem;
+    text-align: center;
+    .dot {
+      display: inline-block;
+      height: .266667rem;
+      width: .266667rem;
+      margin: 0 .106667rem;
+      border-radius: 50%;
+      background: $color-text-l;
+      &.active {
+        width: .4rem;
+        border-radius: 25%;
+        background: $color-text-ll;
       }
     }
   }

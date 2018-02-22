@@ -61,7 +61,6 @@ export default {
     },
     refresh() {
       if (this.scroll.refresh) this.scroll.refresh();
-      console.log('滚动组件已更新');
     },
     scrollToElement(dom) {
       if (this.scroll.scrollToElement) this.scroll.scrollToElement(dom);

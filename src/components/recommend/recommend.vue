@@ -103,14 +103,17 @@ export default {
 
 <style lang="scss" scoped>
 .recommend {
-  position: relative;
-  height: calc(100% - 2.133333rem);
+  // 调用fixed可以通过top/bottom来调整高度，relative和absolute不行
+  position: fixed;
+  width: 100%;
+  top: 2.133333rem;
+  bottom: 0;
   .scroll {
     height: 100%;
     overflow: hidden;
-    .banner-img {
-      width: 100%;
-    }
+    // .banner-img {
+    //   width: 100%;
+    // }
     .recommend-list {
       h1 {
         @include font-dpr($font-size-medium);
