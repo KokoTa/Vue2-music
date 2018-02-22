@@ -5,7 +5,7 @@
       <!-- scroll-conetnt作为总内容 -->
       <div class="scroll-content">
         <!-- swiper -->
-        <!-- 不要用v-lazy加载，会产生样式错位，原因未知 -->
+        <!-- swiper不要用v-lazy加载，会产生样式错位，原因未知 -->
         <!-- <slider :sliderUpdate="sliderUpdate">
           <div class="swiper-slide"
             v-for="(item, index) in banners"
@@ -15,9 +15,9 @@
         </slider> -->
         <!-- better-scroll -->
         <div v-if="banners.length" class="slider-wrapper">
-          <slider>
+          <slider :data="banners">
             <div v-for="(item, index) in banners" :key="index">
-              <img :src="item.pic" alt="#">
+              <a href="http://www.baidu.com"><img v-lazy="item.pic" alt="#"></a>
             </div>
           </slider>
         </div>

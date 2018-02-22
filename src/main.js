@@ -13,7 +13,7 @@ Fastclick.attach(document.body); // 取消移动端点击的300ms延迟
 Vue.prototype.axios = Axios; // 挂载axios到Vue上
 Vue.use(InfiniteScroll); // 下拉加载插件
 Vue.use(VueLazyload, { // 懒加载图片插件
-  loading: 'http://via.placeholder.com/350x150',
+  loading: 'http://via.placeholder.com/414x161',
 });
 
 Vue.config.productionTip = false;

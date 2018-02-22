@@ -1,5 +1,5 @@
 <template>
-  <div ref="wrapper">
+  <div class="wrapper" ref="wrapper">
     <slot></slot>
   </div>
 </template>
@@ -49,13 +49,22 @@ export default {
       }
       this.scroll = new BScroll(this.$refs.wrapper, {
         probeType: this.probeType,
-        click: this.click,
       });
 
-      if (this.listenScroll) { // 是否允许监听scroll事件
+      if (this.listenScroll) {
         const me = this;
         this.scroll.on('scroll', (pos) => {
+          // 切换时总是有机率出现无法滑动的BUG，此时的hasVerticalScroll为false，scrollHeight等值都为0
+          // 原因可能是：http://blog.csdn.net/ohradiance/article/details/78509542
+          if (!me.scroll.hasVerticalScroll) {
+            me.scroll.refresh();
+          }
           me.$emit('scroll', pos);
+        });
+      }
+      if (this.beforeScroll) {
+        this.scroll.on('beforeScrollStart', () => {
+          this.$emit('beforeScroll');
         });
       }
     },
@@ -65,19 +74,16 @@ export default {
     scrollToElement(dom) {
       if (this.scroll.scrollToElement) this.scroll.scrollToElement(dom);
     },
-    scrollTo(dom) {
-      if (this.scroll.scrollTo) this.scroll.scrollTo(dom);
-    },
   },
   watch: {
     data() {
-      this.$nextTick(() => { // 等待DOM更新后刷新scroll
+      setTimeout(() => { // 延迟加载或者nextTick都可以
         this.refresh();
-      });
+      }, this.refreshDelay);
     },
   },
 };
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 </style>

@@ -40,16 +40,16 @@ export default {
       children: [], // 子元素集合
       slider: null, // slider实例
       childLength: 0, // 一开始的子元素长度
-      timer: null, // 自动播放定时器
+      timer: null, // 定时器
     };
   },
   methods: {
     setSliderWidth(isResize) { // 初始化或更新slider-group的宽度；isResize判断是否更改了分辨率
-      this.children = this.$refs['slider-group'].children; // 获得子元素
+      this.children = this.$refs['slider-group'].children;
       this.childLength = this.children.length;
 
       let width = 0;
-      const sliderWidth = this.$refs.slider.clientWidth; // slider可视宽度
+      const sliderWidth = this.$refs.slider.clientWidth;
       for (let i = 0; i < this.children.length; i += 1) {
         const child = this.children[i];
         child.classList.add('slider-item'); // 注意这里我们是在这个组件里给分配的内容添加样式，而不是在外组件中
@@ -70,24 +70,33 @@ export default {
         scrollY: false,
         momentum: false,
         snap: {
-          loop: true,
+          loop: this.loop,
           threshold: 0.3,
           speed: 1000,
-          click: true, // 点击跳转时有可能与fastclick产生冲突，删除这个就好了
         },
       });
 
       this.slider.on('scrollEnd', () => {
         const pageIndex = this.slider.getCurrentPage().pageX;
         this.currentPageIndex = pageIndex;
+
+        if (this.autoPlay) {
+          this.play();
+        }
+      });
+
+      this.slider.on('beforeScrollStart', () => {
+        if (this.autoPlay) {
+          clearTimeout(this.timer);
+        }
       });
     },
     initDots() {
       this.dots = new Array(this.childLength);
     },
     play() {
-      this.timer = setInterval(() => {
-        this.slider.goToPage(this.currentPageIndex + 1, 0, 400);
+      this.timer = setTimeout(() => { // 最好别用setInterval
+        this.slider.next();
       }, this.interval);
     },
   },
@@ -102,7 +111,7 @@ export default {
       }
     });
 
-    window.addEventListener('resize', () => {
+    window.addEventListener('resize', () => { // 监听页面是否改变，更新slider组件
       if (!this.slider) { // 如果还未初始化，就跳过
         return false;
       }
@@ -110,6 +119,15 @@ export default {
       this.slider.refresh();
       return true;
     });
+  },
+  activated() { // keep-alive情况下进入组件时清理定时器
+    clearTimeout(this.timer);
+    if (this.autoPlay) {
+      this.play();
+    }
+  },
+  deactivated() { // 同理
+    clearTimeout(this.timer);
   },
 };
 </script>
