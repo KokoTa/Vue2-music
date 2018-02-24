@@ -17,7 +17,8 @@
         <div v-if="banners.length" class="slider-wrapper">
           <slider :data="banners">
             <div v-for="(item, index) in banners" :key="index">
-              <a href="http://www.baidu.com"><img v-lazy="item.pic" alt="#"></a>
+              <!-- 别用v-lazy，因为后期组件在loop时添加的dom将得不到图片，详情见slider组件 -->
+              <a href="http://www.baidu.com"><img :src="item.pic" alt="#"></a>
             </div>
           </slider>
         </div>

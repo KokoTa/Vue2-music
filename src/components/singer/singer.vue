@@ -1,12 +1,14 @@
 <template>
   <article class="singer" ref="singer">
-    <list-view :data="singers"></list-view>
+    <list-view :data="singers" @select="selectSinger"></list-view>
+    <router-view></router-view>
   </article>
 </template>
 
 <script>
 import api from '@/api/api';
 import ListView from '@/base/listview/listview';
+import { mapMutations } from 'vuex';
 
 export default {
   name: 'singer',
@@ -17,6 +19,17 @@ export default {
     return {
       singers: [],
     };
+  },
+  methods: {
+    selectSinger(singer) {
+      this.$router.push({
+        path: `/singer/${singer.id}`,
+      });
+      this.setSinger(singer);
+    },
+    ...mapMutations({
+      setSinger: 'SET_SINGER',
+    }),
   },
   created() {
     this.axios.get(api.singer)

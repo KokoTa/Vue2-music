@@ -17,7 +17,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '~@/common/style/variable.scss'; // 不加~会以这个文件夹作为相对路径，加了之后会当作模块路径处理（也就是以项目根目录作为相对路径）
+// style中以 ~ 开头，其后的部分将会被看作模块依赖。这意味着你可以用该特性来引用一个 node 依赖中的资源
+// style中以 @ 开头，报错
+// style中以 ~@ 开头， 与 script 中用 @ 等价
+@import '~@/common/style/variable.scss';
 @import '~@/common/style/mixin.scss';
 
 .m-header {

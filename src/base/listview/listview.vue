@@ -17,7 +17,8 @@
         <ul>
           <li class="group-item"
           v-for="(item, index) in group"
-          :key="index">
+          :key="index"
+          @click="selectItem(item)">
             <img class="avatar" v-lazy="item.img1v1Url" alt="#">
             <span class="name">{{ item.name }}</span>
           </li>
@@ -62,7 +63,7 @@ export default {
     return {
       currentIndex: 0, // 当前组
       groupsOffsetTop: [], // 组的offset集合
-      fixShow: true, // 固定栏是否显示(一开始设为显示，因为要获得它的高，自适应条件下的高度是不同滴)
+      fixShow: false, // 固定栏是否显示
     };
   },
   computed: {
@@ -126,6 +127,9 @@ export default {
       } else {
         this.fixShow = true;
       }
+    },
+    selectItem(item) { // listview是基础组件，不参与业务逻辑（比如点击后发生的事情）
+      this.$emit('select', item);
     },
   },
   watch: {
