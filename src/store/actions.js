@@ -5,7 +5,6 @@ const actions = {
   // 获得歌手 -> 获得歌手热歌信息 -> 获得歌曲播放地址 -> 返回整合后的对象（繁琐= =）
   // 同时这个方法只针对歌手的歌曲获得，还未支持歌单或专辑的歌曲获得
   getSongsPlay({ state, commit }, songsInfo) {
-    commit('SET_SONGS', []); // 每次求值都清空数据，防止切换时加载之前的数据
     return Promise.all(songsInfo.map((item) => {
       const id = item.id;
       return axios.get(api.songInfo + id)

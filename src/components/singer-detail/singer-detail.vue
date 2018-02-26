@@ -1,12 +1,13 @@
 <template>
   <transition name="singer-detail-slide">
+    <!-- music-list > scroll -> song-list -->
     <music-list :title="singer.name" :songs="songs" :bgImage="singer.picUrl"></music-list>
   </transition>
 </template>
 
 <script>
 import api from '@/api/api';
-import { mapGetters, mapActions } from 'vuex';
+import { mapGetters, mapMutations, mapActions } from 'vuex';
 import MusicList from '@/components/music-list/music-list';
 
 export default {
@@ -23,16 +24,16 @@ export default {
         this.$router.push('/singer');
         return;
       }
-
-      this.axios.get(api.singerSongs + id)
+      this.SET_SONGS([]); // 清空数据
+      this.axios.get(api.singerSongs + id) // 获得某歌手音乐的播放地址集合
         .then((res) => {
           if (res.status === 200) {
             const songsInfo = res.data.hotSongs;
-            this.getSongsPlay(songsInfo, this.singer)
-              .then(() => console.log(this.songs, this.singer));
+            this.getSongsPlay(songsInfo, this.singer);
           }
         });
     },
+    ...mapMutations(['SET_SONGS']),
     ...mapActions(['getSongsPlay']),
   },
   created() {

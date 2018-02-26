@@ -1,8 +1,8 @@
 <template>
   <article class="recommend">
-    <!-- scroll作为总内容的外部包裹层, :data监听数据变化来刷新scroll高度 -->
+    <!-- scroll作为wrapper容器的包裹层, :data监听数据变化来刷新scroll高度 -->
     <scroll class="scroll" ref="scroll" :data="recommends">
-      <!-- scroll-conetnt作为总内容 -->
+      <!-- scroll-conetnt作为wrapper容器 -->
       <div class="scroll-content">
         <!-- swiper -->
         <!-- swiper不要用v-lazy加载，会产生样式错位，原因未知 -->

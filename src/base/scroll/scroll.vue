@@ -1,5 +1,6 @@
 <template>
-  <div class="wrapper" ref="wrapper">
+  <div ref="BS">
+    <!-- slot里面需要放： 一个wrapper容器(不用设置样式，它会自适应BS的大小)，大于wrapper的内容容器 -->
     <slot></slot>
   </div>
 </template>
@@ -24,7 +25,9 @@ export default {
     },
     data: {
       type: Array,
-      default: null,
+      default() {
+        return [];
+      },
     },
     pullup: {
       type: Boolean,
@@ -44,10 +47,10 @@ export default {
   },
   methods: {
     initScroll() {
-      if (!this.$refs.wrapper) {
+      if (!this.$refs.BS) {
         return;
       }
-      this.scroll = new BScroll(this.$refs.wrapper, {
+      this.scroll = new BScroll(this.$refs.BS, {
         probeType: this.probeType,
       });
 
@@ -76,7 +79,7 @@ export default {
     },
   },
   watch: {
-    data() {
+    data() { // 当有数据传入时进行刷新
       setTimeout(() => { // 延迟加载或者nextTick都可以
         this.refresh();
       }, this.refreshDelay);
@@ -86,4 +89,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+// BS的样式写在引用它的组件中
 </style>
