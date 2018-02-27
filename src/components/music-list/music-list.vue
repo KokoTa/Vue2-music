@@ -22,7 +22,7 @@
     :listenScroll="true"
     @scroll="scroll">
       <div class="scroll-wrapper">
-        <song-list :songs="songs"></song-list>
+        <song-list :songs="songs" @select="selectItem"></song-list>
       </div>
       <div v-show="!songs.length" class="loading">
         <loading></loading>
@@ -37,6 +37,7 @@ import Scroll from '@/base/scroll/scroll';
 import SongList from '@/base/song-list/song-list';
 import prefixStyle from '@/common/js/prefix'; // 前缀判断
 import Loading from '@/base/loading/loading';
+import { mapActions } from 'vuex';
 
 const transform = prefixStyle('transform');
 
@@ -102,6 +103,14 @@ export default {
       }
       this.$refs.bgImage.style[transform] = `scale(${scalePercent})`;
     },
+    selectItem(item, index) {
+      this.setPlayInfo({
+        list: this.songs,
+        item,
+        index,
+      });
+    },
+    ...mapActions(['setPlayInfo']),
   },
   mounted() {
     // 控制scroll位置

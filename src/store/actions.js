@@ -1,5 +1,6 @@
 import api from '@/api/api';
 import axios from 'axios';
+import type from './mutation-type';
 
 const actions = {
   // 获得歌手 -> 获得歌手热歌信息 -> 获得歌曲播放地址 -> 返回整合后的对象（繁琐= =）
@@ -24,9 +25,16 @@ const actions = {
         });
     })).then((res) => {
       const songsPlay = res;
-      commit('SET_SONGS', songsPlay);
+      commit(type.SET_SONGS, songsPlay);
       return songsPlay;
     });
+  },
+  setPlayInfo({ commit }, { list, index }) {
+    commit(type.SET_SEQUENCELIST, list);
+    commit(type.SET_PLAYLIST, list);
+    commit(type.SET_CURRENT_INDEX, index);
+    commit(type.SET_FULL_SCREEN, true);
+    commit(type.SET_PLAYING_STATE, true);
   },
 };
 
