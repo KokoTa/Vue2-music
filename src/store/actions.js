@@ -16,7 +16,7 @@ const actions = {
             songName: item.name,
             alName: item.al.name,
             alPic: item.al.picUrl,
-            playUrl: null,
+            url: null,
           };
           if (res.status === 200) {
             obj.url = res.data.data[0].url;

@@ -52,6 +52,7 @@ export default {
       }
       this.scroll = new BScroll(this.$refs.BS, {
         probeType: this.probeType,
+        click: true, // 解决安卓无法点击的问题
       });
 
       if (this.listenScroll) {
