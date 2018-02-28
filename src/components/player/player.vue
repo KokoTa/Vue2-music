@@ -37,14 +37,14 @@
             <div class="icon right">
               <i class="fas fa-exchange-alt fa-2x"></i>
             </div>
-            <div class="icon right">
-              <i class="fas fa-backward fa-2x"></i>
+            <div class="icon">
+              <i @click="prevSong" class="fas fa-backward fa-2x"></i>
             </div>
             <div class="icon">
-              <i @click="togglePlay" class="fas fa-3x" :class="playIcon"></i>
+              <i @click="togglePlay" class="fas fa-4x" :class="playIcon"></i>
             </div>
-            <div class="icon left">
-              <i class="fas fa-forward fa-2x"></i>
+            <div class="icon">
+              <i @click="nextSong" class="fas fa-forward fa-2x"></i>
             </div>
             <div class="icon left">
               <i class="far fa-heart fa-2x"></i>
@@ -86,6 +86,7 @@ export default {
       'playList',
       'currentSong',
       'playing',
+      'currentIndex',
     ]),
     playIcon() {
       if (this.playing) {
@@ -100,6 +101,11 @@ export default {
       return 'rotate-animation rotate-animation-pause';
     },
   },
+  data() {
+    return {
+      ready: false,
+    };
+  },
   methods: {
     toggleFullScreen() {
       this.SET_FULL_SCREEN(!this.fullScreen);
@@ -113,9 +119,42 @@ export default {
         audio.pause();
       }
     },
+    prevSong() {
+      // 切歌太快会使audio来不及暂停并加载新音乐，导致新音乐播放时play事件报错
+      // https://developers.google.com/web/updates/2017/06/play-request-was-interrupted
+      const audio = this.$refs.audio;
+      const play = audio.play();
+      if (play !== undefined) {
+        play.then(() => {
+          audio.pause(); // 安全暂停
+
+          let index = this.currentIndex - 1;
+          if (index === -1) {
+            index = this.playList.length - 1;
+          }
+          this.SET_CURRENT_INDEX(index);
+        });
+      }
+    },
+    nextSong() {
+      const audio = this.$refs.audio;
+      const play = audio.play();
+      if (play !== undefined) {
+        play.then(() => {
+          audio.pause(); // 安全暂停
+
+          let index = this.currentIndex + 1;
+          if (index === this.playList.length) {
+            index = 0;
+          }
+          this.SET_CURRENT_INDEX(index);
+        });
+      }
+    },
     ...mapMutations([
       'SET_FULL_SCREEN',
       'SET_PLAYING_STATE',
+      'SET_CURRENT_INDEX',
     ]),
   },
   watch: {
@@ -232,6 +271,7 @@ export default {
       }
       .operation-wrapper {
         display: flex;
+        margin-top: .133333rem;
         .icon {
           flex: 1;
           text-align: center;
