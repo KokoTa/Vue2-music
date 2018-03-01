@@ -1,6 +1,6 @@
 <template>
   <div class="player" v-if="playList.length">
-    <!-- 全屏播放器 -->
+    <!-- 全屏播放页 -->
     <transition name="full">
       <div class="player-full" v-show="fullScreen">
         <!-- 背景 -->
@@ -31,7 +31,17 @@
             <span class="dot"></span>
           </div>
           <div class="process-wrapper">
-            <div></div>
+            <span class="time time-left">
+              {{ formatTime(currentTime) }}
+            </span>
+            <div class="process-package">
+              <progress-bar :percent="percent"
+              @percentChange="percentChange">
+              </progress-bar>
+            </div>
+            <span class="time time-right">
+              {{ formatTime(totalTime) }}
+            </span>
           </div>
           <div class="operation-wrapper">
             <div class="icon right">
@@ -53,6 +63,7 @@
         </div>
       </div>
     </transition>
+    <!-- 迷你播放器 -->
     <transition name="mini">
       <div class="player-mini" v-show="!fullScreen" @click="toggleFullScreen">
         <div class="icon">
@@ -63,7 +74,9 @@
           <h2 class="subtitle">{{ currentSong.singerName }}</h2>
         </div>
         <div class="control">
-          <i @click.stop="togglePlay" class="fas fa-2x" :class="playIcon"></i>
+          <progress-circle :radius="35" :percent="percent">
+            <i @click.stop="togglePlay" class="fas fa-2x play-icon" :class="playIcon"></i>
+          </progress-circle>
         </div>
         <div class="control">
           <i class="fas fa-music fa-2x"></i>
@@ -71,15 +84,23 @@
       </div>
     </transition>
     <!-- 播放器 -->
-    <audio :src="currentSong.url" ref="audio"></audio>
+    <audio :src="currentSong.url"
+    ref="audio"
+    @timeupdate="timeUpdate"></audio>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapMutations } from 'vuex';
+import ProgressBar from '@/base/progress-bar/progress-bar';
+import ProgressCircle from '@/base/progress-circle/progress-circle';
 
 export default {
   name: 'player',
+  components: {
+    ProgressBar,
+    ProgressCircle,
+  },
   computed: {
     ...mapGetters([
       'fullScreen',
@@ -100,10 +121,14 @@ export default {
       }
       return 'rotate-animation rotate-animation-pause';
     },
+    percent() {
+      return this.currentTime / this.totalTime;
+    },
   },
   data() {
     return {
-      ready: false,
+      currentTime: '0:00', // 音乐当前时间
+      totalTime: '0:00', // 音乐总时间
     };
   },
   methods: {
@@ -150,6 +175,29 @@ export default {
           this.SET_CURRENT_INDEX(index);
         });
       }
+    },
+    timeUpdate(e) {
+      this.currentTime = e.target.currentTime; // 可读写
+      this.totalTime = e.target.duration;
+    },
+    formatTime(t) {
+      // t以秒为单位，|等于调用了Math.floor
+      const x = t | 0;
+      let h = x / 60 / 60 | 0;
+      let m = x / 60 | 0;
+      let s = x % 60 | 0;
+      // 补0
+      if (h > 0 && m < 10) {
+        m = `0${m}:`;
+      } else {
+        m = `${m}:`;
+      }
+      h = h === 0 ? '' : `${h}:`;
+      s = s < 10 ? `0${s}` : s;
+      return `${h}${m}${s}`;
+    },
+    percentChange(newPercent) {
+      this.$refs.audio.currentTime = this.totalTime * newPercent;
     },
     ...mapMutations([
       'SET_FULL_SCREEN',
@@ -269,9 +317,31 @@ export default {
           }
         }
       }
+      .process-wrapper {
+        width: 80%;
+        margin: 0 auto;
+        display: flex;
+        padding: .266667rem 0;
+        align-items: center;
+        .time {
+          display: inline-block;
+          color: $color-text;
+          @include font-dpr($font-size-small);
+          width: .8rem;
+          line-height: .533333rem;
+          &.time-left {
+            text-align: left;
+          }
+          &.time-right {
+            text-align: right;
+          }
+        }
+        .process-package {
+          flex: 1;
+        }
+      }
       .operation-wrapper {
         display: flex;
-        margin-top: .133333rem;
         .icon {
           flex: 1;
           text-align: center;
@@ -325,6 +395,11 @@ export default {
     .control {
       width: 1.066667rem;
       color: $color-theme;
+      .play-icon {
+        position: absolute;
+        left: .14rem;
+        top: .15rem;
+      }
     }
   }
   .rotate-animation {

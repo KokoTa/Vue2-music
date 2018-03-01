@@ -26,6 +26,9 @@ module.exports = {
   // add your custom rules here
   rules: {
     'no-console': "off",
+    'no-bitwise': 'off',
+    'prefer-template': 'off',
+    'operator-assignment': 'off',
     // don't require .vue extension when importing
     'import/extensions': ['error', 'always', {
       js: 'never',
