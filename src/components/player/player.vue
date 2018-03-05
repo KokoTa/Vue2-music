@@ -45,7 +45,7 @@
           </div>
           <div class="operation-wrapper">
             <div class="icon right">
-              <i class="fas fa-exchange-alt fa-2x"></i>
+              <i @click="changeMode" class="fas fa-2x" :class="modeIcon"></i>
             </div>
             <div class="icon">
               <i @click="prevSong" class="fas fa-backward fa-2x"></i>
@@ -86,7 +86,8 @@
     <!-- 播放器 -->
     <audio :src="currentSong.url"
     ref="audio"
-    @timeupdate="timeUpdate"></audio>
+    @timeupdate="timeUpdate"
+    @ended="songEnd"></audio>
   </div>
 </template>
 
@@ -94,6 +95,8 @@
 import { mapGetters, mapMutations } from 'vuex';
 import ProgressBar from '@/base/progress-bar/progress-bar';
 import ProgressCircle from '@/base/progress-circle/progress-circle';
+import playMode from '@/common/js/config'; // 播放模式
+import shuffle from '@/common/js/shuffle'; // 洗牌
 
 export default {
   name: 'player',
@@ -108,6 +111,8 @@ export default {
       'currentSong',
       'playing',
       'currentIndex',
+      'mode',
+      'sequenceList',
     ]),
     playIcon() {
       if (this.playing) {
@@ -123,6 +128,11 @@ export default {
     },
     percent() {
       return this.currentTime / this.totalTime;
+    },
+    modeIcon() {
+      if (this.mode === playMode.sequence) return 'fa-exchange-alt';
+      if (this.mode === playMode.loop) return 'fa-sync-alt';
+      return 'fa-random';
     },
   },
   data() {
@@ -199,14 +209,54 @@ export default {
     percentChange(newPercent) {
       this.$refs.audio.currentTime = this.totalTime * newPercent;
     },
+    changeMode() {
+      const mode = (this.mode + 1) % 3;
+      this.SET_PLAY_MODE(mode);
+
+      let list = [];
+      if (this.mode === playMode.sequence || this.mode === playMode.loop) {
+        list = this.sequenceList;
+      } else {
+        list = shuffle(this.sequenceList);
+      }
+
+      this.resetCurrentIndex(list);
+      this.SET_PLAYLIST(list);
+    },
+    resetCurrentIndex(list) { // 更新索引
+      const index = list.findIndex((item) => {
+        const b = item.songName === this.currentSong.songName;
+        return b;
+      });
+      this.SET_CURRENT_INDEX(index);
+    },
+    songEnd() {
+      if (this.mode === playMode.loop) {
+        this.loop();
+      } else {
+        this.nextSong();
+      }
+    },
+    loop() {
+      this.$refs.audio.currentTime = 0;
+      this.$refs.audio.play();
+      this.SET_PLAYING_STATE(true);
+    },
     ...mapMutations([
       'SET_FULL_SCREEN',
       'SET_PLAYING_STATE',
       'SET_CURRENT_INDEX',
+      'SET_PLAY_MODE',
+      'SET_PLAYLIST',
     ]),
   },
   watch: {
-    currentSong() {
+    currentSong(newSong, oldSong) {
+      console.log(newSong, oldSong);
+      // 插件刚开始时并没有oldSong，会报错
+      // 阻止暂停后切歌会播放歌曲
+      if (oldSong && (newSong.songName === oldSong.songName)) return;
+
       this.$nextTick(() => { // 更新了资源，需要等待DOM更新
         this.SET_PLAYING_STATE(true);
         this.$refs.audio.play();

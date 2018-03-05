@@ -2,12 +2,12 @@
   <div class="progress-bar" ref="progressBar" @click="progressClick">
     <div class="progress-content">
       <div class="progress" ref="progress"></div>
-      <!-- 加prevent防止拖动浏览器 -->
+      <!-- 加prevent防止拖动浏览器, stop防止事件冒泡 -->
       <div class="progress-btn-wrapper"
       ref="progressBtnWrapper"
-      @touchstart.prevent="touchStart"
-      @touchmove.prevent="touchMove"
-      @touchend.prevent="touchEnd">
+      @touchstart.stop.prevent="touchStart"
+      @touchmove.stop.prevent="touchMove"
+      @touchend.stop.prevent="touchEnd">
         <div class="progress-btn" ref="progressBtn"></div>
       </div>
     </div>
@@ -79,7 +79,7 @@ export default {
       // 改变进度条和按钮位置
       // 注意：当拖动时如果音乐还在播放，会出现鬼畜现象
       // 因为音乐时间变化触发了percent变化，会触发改变宽度的操作
-      // 导致和touchmove事件产生冲突，因此在拖动时要阻止改变宽度的操作
+      // 导致和touchmove事件产生冲突，因此在拖动时要阻止因percent变化而导致的改变宽度的操作
       // 所以使用了 this.touch.init
       if (newVal >= 0 && !this.touch.init) {
         const offsetX = this.actualWidth * newVal;

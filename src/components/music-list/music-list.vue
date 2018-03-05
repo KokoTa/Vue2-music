@@ -7,7 +7,7 @@
     <div class="bg-image" :style="bgStyle" ref="bgImage">
       <div class="mask"></div>
       <div class="play-wrapper" v-show="songs.length" ref="playWrapper">
-        <div class="play-content">
+        <div class="play-content" @click="randomPlay">
           <i class="fas fa-play fa-lg icon-play"></i>
           <span class="play-text">随机播放</span>
         </div>
@@ -110,7 +110,15 @@ export default {
         index,
       });
     },
-    ...mapActions(['setPlayInfo']),
+    randomPlay() {
+      this.setRandomPlayInfo({
+        list: this.songs,
+      });
+    },
+    ...mapActions([
+      'setPlayInfo',
+      'setRandomPlayInfo',
+    ]),
   },
   mounted() {
     // 控制scroll位置
