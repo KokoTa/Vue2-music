@@ -17,12 +17,27 @@
         </div>
         <!-- 中部 -->
         <div class="middle">
-          <div class="rotate-img" :class="playRotate">
-            <img :src="currentSong.alPic" alt="#">
-          </div>
-          <div class="lyric-wrapper">
-            <p class="lyric">awoeof naowenf eo dasd</p>
-          </div>
+          <!-- <div class="middle-left">
+            <div class="rotate-img" :class="playRotate">
+              <img :src="currentSong.alPic" alt="#">
+            </div>
+            <div class="lyric-wrapper">
+              <p class="lyric">awoeof naowenf eo dasd</p>
+            </div>
+          </div> -->
+          <scroll class="middle-right" :data="currentLyric && currentLyric.lines" ref="lyricScroll">
+            <div class="lyric-list">
+              <div v-if="currentLyric">
+                <p ref="lyricLine"
+                  class="text"
+                  :class="{'current': currentLineNum ===index}"
+                  v-for="(item, index) in currentLyric.lines"
+                  :key="index">
+                  {{ item.txt }}
+                </p>
+              </div>
+            </div>
+          </scroll>
         </div>
         <!-- 底部 -->
         <div class="bottom">
@@ -99,12 +114,14 @@ import playMode from '@/common/js/config'; // 播放模式
 import shuffle from '@/common/js/shuffle'; // 洗牌
 import getLyric from '@/common/js/getLyric'; // 获取歌词
 import Lyric from '@/common/js/lyricParse'; // 解析歌词
+import Scroll from '@/base/scroll/scroll';
 
 export default {
   name: 'player',
   components: {
     ProgressBar,
     ProgressCircle,
+    Scroll,
   },
   computed: {
     ...mapGetters([
@@ -141,6 +158,8 @@ export default {
     return {
       currentTime: '0:00', // 音乐当前时间
       totalTime: '0:00', // 音乐总时间
+      currentLyric: null, // 当前歌词对象
+      currentLineNum: 0, // 当前歌词行
     };
   },
   methods: {
@@ -244,6 +263,26 @@ export default {
       this.$refs.audio.play();
       this.SET_PLAYING_STATE(true);
     },
+    getSongLyric(song) {
+      // 获取歌词
+      getLyric(song.id).then((res) => {
+        this.currentLyric = new Lyric(res, this.lyricHandle);
+        if (this.playing) {
+          this.currentLyric.play();
+        }
+      });
+    },
+    lyricHandle(obj) { // 每次歌词跳转就执行回调
+      // 赋值当前行，触发高亮
+      this.currentLineNum = obj.curNum;
+      // 当行数大于5时才允许滚动，每次滚动一句，否则固定在顶部不动
+      if (obj.curNum > 5) {
+        this.$refs.lyricScroll.scrollToElement(this.$refs.lyricLine[obj.curNum - 5], 1000);
+      } else {
+        this.$refs.lyricScroll.scrollTo(0, 0, 1000);
+      }
+      console.log(obj.curNum);
+    },
     ...mapMutations([
       'SET_FULL_SCREEN',
       'SET_PLAYING_STATE',
@@ -264,11 +303,7 @@ export default {
         this.$refs.audio.play();
       });
 
-      // 获取歌词
-      getLyric(newSong.id).then((res) => {
-        const L = new Lyric(res);
-        L.play();
-      });
+      this.getSongLyric(newSong);
     },
   },
 };
@@ -333,25 +368,56 @@ export default {
       width: 100%;
       top: 2.133333rem;
       bottom: 4rem;
-      .rotate-img {
+      font-size: 0; // 删除inline-block元素之间的间隙
+      white-space: nowrap;
+      .middle-left {
+        display: inline-block;
+        vertical-align: top;
+        width: 100%;
+        height: 100%;
         position: relative;
-        width: 80%;
-        margin: 0 auto;
-        img {
-          box-sizing: border-box;
-          width: 100%;
-          border-radius: 50%;
-          border: .266667rem solid rgba(255, 255, 255, .1);
+        .rotate-img {
+          position: relative;
+          width: 80%;
+          margin: 0 auto;
+          img {
+            box-sizing: border-box;
+            width: 100%;
+            border-radius: 50%;
+            border: .266667rem solid rgba(255, 255, 255, .1);
+          }
+        }
+        .lyric-wrapper {
+          text-align: center;
+          margin: .8rem .533333rem;
+          .lyric {
+            line-height: .48rem;
+            @include font-dpr($font-size-large);
+            @include no-wrap;
+            color: $color-text-l;
+          }
         }
       }
-      .lyric-wrapper {
-        text-align: center;
-        margin: .8rem .533333rem;
-        .lyric {
-          line-height: .48rem;
-          @include font-dpr($font-size-large);
-          @include no-wrap;
-          color: $color-text-l;
+      .middle-right {
+        display: inline-block;
+        vertical-align: top;
+        width: 100%;
+        height: 95%;
+        overflow: hidden;
+        .lyric-list {
+          width: 80%;
+          margin: 0 auto;
+          overflow: hidden;
+          text-align: center;
+          .text {
+            line-height: 32px;
+            @include font-dpr($font-size-medium);
+            @include no-wrap;
+            color: $color-text-l;
+            &.current {
+              color: $color-text;
+            }
+          }
         }
       }
     }

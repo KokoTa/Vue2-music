@@ -75,8 +75,11 @@ export default {
     refresh() {
       if (this.scroll.refresh) this.scroll.refresh();
     },
-    scrollToElement(dom) {
-      if (this.scroll.scrollToElement) this.scroll.scrollToElement(dom);
+    scrollToElement(dom, time) {
+      if (this.scroll.scrollToElement) this.scroll.scrollToElement(dom, time);
+    },
+    scrollTo(x, y, time, easing) {
+      if (this.scroll.scrollTo) this.scroll.scrollTo(x, y, time, easing);
     },
   },
   watch: {
