@@ -97,6 +97,8 @@ import ProgressBar from '@/base/progress-bar/progress-bar';
 import ProgressCircle from '@/base/progress-circle/progress-circle';
 import playMode from '@/common/js/config'; // 播放模式
 import shuffle from '@/common/js/shuffle'; // 洗牌
+import getLyric from '@/common/js/getLyric'; // 获取歌词
+import Lyric from '@/common/js/lyricParse'; // 解析歌词
 
 export default {
   name: 'player',
@@ -260,6 +262,12 @@ export default {
       this.$nextTick(() => { // 更新了资源，需要等待DOM更新
         this.SET_PLAYING_STATE(true);
         this.$refs.audio.play();
+      });
+
+      // 获取歌词
+      getLyric(newSong.id).then((res) => {
+        const L = new Lyric(res);
+        L.play();
       });
     },
   },

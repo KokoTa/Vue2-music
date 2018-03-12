@@ -19,6 +19,7 @@ const actions = {
             alName: item.al.name,
             alPic: item.al.picUrl,
             url: null,
+            id,
           };
           if (res.status === 200) {
             obj.url = res.data.data[0].url;
