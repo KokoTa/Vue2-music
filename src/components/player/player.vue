@@ -16,16 +16,19 @@
           <h2 class="subtitle">{{ currentSong.singerName }}</h2>
         </div>
         <!-- 中部 -->
-        <div class="middle">
-          <!-- <div class="middle-left">
+        <div class="middle"
+          @touchstart.prevent.stop="middleTouchStart"
+          @touchmove.prevent.stop="middleTouchMove"
+          @touchend.prevent.stop="middleTouchEnd">
+          <div class="middle-left" ref="middleLeft">
             <div class="rotate-img" :class="playRotate">
               <img :src="currentSong.alPic" alt="#">
             </div>
             <div class="lyric-wrapper">
               <p class="lyric">awoeof naowenf eo dasd</p>
             </div>
-          </div> -->
-          <scroll class="middle-right" :data="currentLyric && currentLyric.lines" ref="lyricScroll">
+          </div>
+          <scroll class="middle-right" :data="currentLyric && currentLyric.lines" ref="middleRight">
             <div class="lyric-list">
               <div v-if="currentLyric">
                 <p ref="lyricLine"
@@ -42,8 +45,8 @@
         <!-- 底部 -->
         <div class="bottom">
           <div class="dot-wrapper">
-            <span class="dot active"></span>
-            <span class="dot"></span>
+            <span class="dot" :class="{'active': currentShow === 'cd'}"></span>
+            <span class="dot" :class="{'active': currentShow === 'lyric'}"></span>
           </div>
           <div class="process-wrapper">
             <span class="time time-left">
@@ -115,6 +118,10 @@ import shuffle from '@/common/js/shuffle'; // 洗牌
 import getLyric from '@/common/js/getLyric'; // 获取歌词
 import Lyric from '@/common/js/lyricParse'; // 解析歌词
 import Scroll from '@/base/scroll/scroll';
+import prefixStyle from '@/common/js/prefix';
+
+const transform = prefixStyle('transform');
+const transitionDuration = prefixStyle('transitionDuration');
 
 export default {
   name: 'player',
@@ -160,6 +167,8 @@ export default {
       totalTime: '0:00', // 音乐总时间
       currentLyric: null, // 当前歌词对象
       currentLineNum: 0, // 当前歌词行
+      currentShow: 'cd', // 中间部位视图
+      touch: {}, // 触摸事件对象
     };
   },
   methods: {
@@ -277,11 +286,80 @@ export default {
       this.currentLineNum = obj.curNum;
       // 当行数大于5时才允许滚动，每次滚动一句，否则固定在顶部不动
       if (obj.curNum > 5) {
-        this.$refs.lyricScroll.scrollToElement(this.$refs.lyricLine[obj.curNum - 5], 1000);
+        this.$refs.middleRight.scrollToElement(this.$refs.lyricLine[obj.curNum - 5], 1000);
       } else {
-        this.$refs.lyricScroll.scrollTo(0, 0, 1000);
+        this.$refs.middleRight.scrollTo(0, 0, 1000);
       }
-      console.log(obj.curNum);
+      console.log(obj);
+    },
+    // 界面滑动
+    middleTouchStart(e) {
+      this.touch.move = false; // 判断是一次点击后滑动的事件，还是一次普通的点击事件
+
+      const touch = e.touches[0];
+      this.touch.startX = touch.pageX;
+      this.touch.startY = touch.pageY;
+
+      // 移动时删除transition-duration，不然会有延迟现象
+      this.$refs.middleRight.$el.style[transitionDuration] = '0ms';
+      this.$refs.middleLeft.style[transitionDuration] = '0ms';
+    },
+    middleTouchMove(e) {
+      this.touch.move = true;
+
+      const touch = e.touches[0];
+      const deltaX = touch.pageX - this.touch.startX;
+      const deltaY = touch.pageY - this.touch.startY;
+      // 横向偏移 < 竖向偏移时，不进行滑动
+      if (Math.abs(deltaX) < Math.abs(deltaY)) {
+        return false;
+      }
+      // 当为cd页时，lyric页的左移距离为0,反之亦然
+      const left = this.currentShow === 'cd' ? 0 : -window.innerWidth;
+      // 移动的距离和范围
+      const offsetWidth = Math.min(0, Math.max(-window.innerWidth, left + deltaX));
+      this.$refs.middleRight.$el.style[transform] = `translateX(${offsetWidth}px)`;
+      // 移动距离与总宽度的比例
+      const percent = Math.abs(offsetWidth / window.innerWidth);
+      this.touch.percent = percent;
+      this.$refs.middleLeft.style.opacity = 1 - percent;
+
+      return true;
+    },
+    middleTouchEnd() {
+      if (!this.touch.move) {
+        return false;
+      }
+
+      let offsetWidth;
+      let opacity;
+      // cd面板时，移动百分10后自动滑动到最终距离并改变当前面板标签和透明度，反之同理
+      if (this.currentShow === 'cd') {
+        if (this.touch.percent > 0.1) {
+          offsetWidth = -window.innerWidth;
+          this.currentShow = 'lyric';
+          opacity = 0;
+        } else {
+          offsetWidth = 0;
+          opacity = 1;
+        }
+      } else if (this.currentShow === 'lyric') {
+        if (this.touch.percent < 0.9) {
+          offsetWidth = 0;
+          this.currentShow = 'cd';
+          opacity = 1;
+        } else {
+          offsetWidth = -window.innerWidth;
+          opacity = 0;
+        }
+      }
+
+      this.$refs.middleRight.$el.style[transform] = `translateX(${offsetWidth}px)`;
+      this.$refs.middleRight.$el.style[transitionDuration] = '500ms';
+      this.$refs.middleLeft.style.opacity = opacity;
+      this.$refs.middleLeft.style[transitionDuration] = '500ms';
+
+      return true;
     },
     ...mapMutations([
       'SET_FULL_SCREEN',
