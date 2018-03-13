@@ -24,8 +24,8 @@
             <div class="rotate-img" :class="playRotate">
               <img :src="currentSong.alPic" alt="#">
             </div>
-            <div class="lyric-wrapper">
-              <p class="lyric">awoeof naowenf eo dasd</p>
+            <div class="lyric-one-wrapper">
+              <p class="lyric-one-text">{{ currentLineText }}</p>
             </div>
           </div>
           <scroll class="middle-right" :data="currentLyric && currentLyric.lines" ref="middleRight">
@@ -169,6 +169,7 @@ export default {
       currentLineNum: 0, // 当前歌词行
       currentShow: 'cd', // 中间部位视图
       touch: {}, // 触摸事件对象
+      currentLineText: '', // 当前歌词
     };
   },
   methods: {
@@ -183,6 +184,10 @@ export default {
       } else {
         audio.pause();
       }
+
+      if (this.currentLyric) {
+        this.currentLyric.togglePlay(this.currentTime * 1000);
+      }
     },
     prevSong() {
       // 切歌太快会使audio来不及暂停并加载新音乐，导致新音乐播放时play事件报错
@@ -193,11 +198,16 @@ export default {
         play.then(() => {
           audio.pause(); // 安全暂停
 
-          let index = this.currentIndex - 1;
-          if (index === -1) {
-            index = this.playList.length - 1;
+          // 极端情况下，当播放列表只有 一首歌时，index最终的结果是不变的，需要判断
+          if (this.playList.length === 1) {
+            this.loop();
+          } else {
+            let index = this.currentIndex - 1;
+            if (index === -1) {
+              index = this.playList.length - 1;
+            }
+            this.SET_CURRENT_INDEX(index);
           }
-          this.SET_CURRENT_INDEX(index);
         });
       }
     },
@@ -208,11 +218,15 @@ export default {
         play.then(() => {
           audio.pause(); // 安全暂停
 
-          let index = this.currentIndex + 1;
-          if (index === this.playList.length) {
-            index = 0;
+          if (this.playList.length === 1) {
+            this.loop();
+          } else {
+            let index = this.currentIndex + 1;
+            if (index === this.playList.length) {
+              index = 0;
+            }
+            this.SET_CURRENT_INDEX(index);
           }
-          this.SET_CURRENT_INDEX(index);
         });
       }
     },
@@ -238,6 +252,9 @@ export default {
     },
     percentChange(newPercent) {
       this.$refs.audio.currentTime = this.totalTime * newPercent;
+
+      this.currentLyric.stop();
+      this.currentLyric.play(this.$refs.audio.currentTime * 1000);
     },
     changeMode() {
       const mode = (this.mode + 1) % 3;
@@ -271,6 +288,8 @@ export default {
       this.$refs.audio.currentTime = 0;
       this.$refs.audio.play();
       this.SET_PLAYING_STATE(true);
+
+      this.currentLyric.play(0);
     },
     getSongLyric(song) {
       // 获取歌词
@@ -279,6 +298,10 @@ export default {
         if (this.playing) {
           this.currentLyric.play();
         }
+      }).catch(() => {
+        this.currentLyric = null;
+        this.currentLineText = '';
+        this.currentLineNum = 0;
       });
     },
     lyricHandle(obj) { // 每次歌词跳转就执行回调
@@ -290,6 +313,9 @@ export default {
       } else {
         this.$refs.middleRight.scrollTo(0, 0, 1000);
       }
+
+      // 当前歌词行
+      this.currentLineText = obj.txt;
       console.log(obj);
     },
     // 界面滑动
@@ -375,6 +401,12 @@ export default {
       // 插件刚开始时并没有oldSong，会报错
       // 阻止暂停后切歌会播放歌曲
       if (oldSong && (newSong.songName === oldSong.songName)) return;
+
+      // 切歌时，上一首歌的歌词还在放（歌词播放利用setTimeout），要关掉它的定时器，否则会鬼畜
+      // 然而你切太快，他还是会不听话😔
+      if (this.currentLyric) {
+        this.currentLyric.stop();
+      }
 
       this.$nextTick(() => { // 更新了资源，需要等待DOM更新
         this.SET_PLAYING_STATE(true);
@@ -465,10 +497,10 @@ export default {
             border: .266667rem solid rgba(255, 255, 255, .1);
           }
         }
-        .lyric-wrapper {
+        .lyric-one-wrapper {
           text-align: center;
           margin: .8rem .533333rem;
-          .lyric {
+          .lyric-one-text {
             line-height: .48rem;
             @include font-dpr($font-size-large);
             @include no-wrap;

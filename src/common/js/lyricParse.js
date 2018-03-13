@@ -28,6 +28,7 @@ export default class Lyric {
     this.curNum = 0; // 当前行索引
     this.lines = []; // 解析后的歌词集合
     this.startStamp = 0; // 某行歌词时间戳（可能是这行歌词开始的时间，也可能是这行歌词唱了一段时间后的时间）
+    this.timer = null;
     this.init();
   }
 
@@ -103,7 +104,18 @@ export default class Lyric {
     }
 
     this.state = PLAYING; // 执行播放
-    this.curNum = this.findCurNum(start); // 找到歌词行
+
+    // 假设：第一句的time为1000ms，第二局为5000ms
+    // 情况一：自动执行（第一次执行）时找到的是第一行，时间差就是第一行的时间，1000 - 0 = 1000，这很OK
+    // 情况二：暂停后执行，假设暂停时的时间为2000ms，此时的若按照情况一，时间差的计算为1000 - 2000 = -1000，这显然是错误的
+    // 因此要故意+1，赋值为后一句，来让 5000 - 3000 = 2000，这才是正确的
+    // 情况三：当自动执行第一句时，在1000ms内暂停，比如700ms，再开始，this.curNum直接+1跳到了第二句，显示是上不一致的
+    // 但时间差为 5000 - 700 = 4300ms，是正常的，仅仅是视图有一次错位而已
+    if (start === 0) {
+      this.curNum = this.findCurNum(start);
+    } else {
+      this.curNum = this.findCurNum(start) + 1; // 注意这个+1的作用
+    }
     this.startStamp = start; // 歌词要开始的时间戳(注意它不一定和歌词集合的时间戳完全对应，比如这条歌词我放一半暂停了，再继续播放时的时间戳肯定不对应啊)
 
     if (this.curNum < this.lines.length) {
