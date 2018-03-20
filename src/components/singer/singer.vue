@@ -1,6 +1,6 @@
 <template>
   <article class="singer" ref="singer">
-    <list-view :data="singers" @select="selectSinger"></list-view>
+    <list-view :data="singers" @select="selectSinger" ref="listView"></list-view>
     <router-view></router-view>
   </article>
 </template>
@@ -9,8 +9,10 @@
 import api from '@/api/api';
 import ListView from '@/base/listview/listview';
 import { mapMutations } from 'vuex';
+import mixin from '@/common/js/mixin';
 
 export default {
+  mixins: [mixin],
   name: 'singer',
   components: {
     ListView,
@@ -21,6 +23,11 @@ export default {
     };
   },
   methods: {
+    handlePlayList(playList) { // 设置视图与底部之间的距离
+      const bottom = playList.length > 0 ? '1.2rem' : '';
+      this.$refs.singer.style.bottom = bottom;
+      this.$refs.listView.refresh();
+    },
     selectSinger(singer) {
       this.$router.push({
         path: `/singer/${singer.id}`,

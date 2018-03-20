@@ -16,10 +16,11 @@
           <h2 class="subtitle">{{ currentSong.singerName }}</h2>
         </div>
         <!-- 中部 -->
+        <!-- 注意touch事件这里不可以添加.stop修饰符，因为这样会阻止scroll组件的滚动，原因就在于这个组件在document监听了touch事件 -->
         <div class="middle"
-          @touchstart.prevent.stop="middleTouchStart"
-          @touchmove.prevent.stop="middleTouchMove"
-          @touchend.prevent.stop="middleTouchEnd">
+          @touchstart.prevent="middleTouchStart"
+          @touchmove.prevent="middleTouchMove"
+          @touchend.prevent="middleTouchEnd">
           <div class="middle-left" ref="middleLeft">
             <div class="rotate-img" :class="playRotate">
               <img :src="currentSong.alPic" alt="#">
@@ -336,18 +337,22 @@ export default {
       const touch = e.touches[0];
       const deltaX = touch.pageX - this.touch.startX;
       const deltaY = touch.pageY - this.touch.startY;
+
+      // 当为cd页时，lyric页的左移距离为0,反之亦然
+      const left = this.currentShow === 'cd' ? 0 : -window.innerWidth;
+      // 移动的距离(有范围）
+      const offsetWidth = Math.min(0, Math.max(-window.innerWidth, left + deltaX));
+      // 移动距离与总宽度的比例
+      const percent = Math.abs(offsetWidth / window.innerWidth);
+      this.touch.percent = percent;
+
       // 横向偏移 < 竖向偏移时，不进行滑动
       if (Math.abs(deltaX) < Math.abs(deltaY)) {
         return false;
       }
-      // 当为cd页时，lyric页的左移距离为0,反之亦然
-      const left = this.currentShow === 'cd' ? 0 : -window.innerWidth;
-      // 移动的距离和范围
-      const offsetWidth = Math.min(0, Math.max(-window.innerWidth, left + deltaX));
+
+      // 拖动时样式
       this.$refs.middleRight.$el.style[transform] = `translateX(${offsetWidth}px)`;
-      // 移动距离与总宽度的比例
-      const percent = Math.abs(offsetWidth / window.innerWidth);
-      this.touch.percent = percent;
       this.$refs.middleLeft.style.opacity = 1 - percent;
 
       return true;
@@ -365,18 +370,22 @@ export default {
           offsetWidth = -window.innerWidth;
           this.currentShow = 'lyric';
           opacity = 0;
+          console.log('1');
         } else {
           offsetWidth = 0;
           opacity = 1;
+          console.log('2');
         }
       } else if (this.currentShow === 'lyric') {
         if (this.touch.percent < 0.9) {
           offsetWidth = 0;
           this.currentShow = 'cd';
           opacity = 1;
+          console.log('3');
         } else {
           offsetWidth = -window.innerWidth;
           opacity = 0;
+          console.log('4');
         }
       }
 

@@ -1,8 +1,10 @@
 <template>
-  <div class="music-list">
+  <div class="music-list" ref="musicList">
+    <!-- 头 -->
     <div class="back" @click="back">
       <i class="fas fa-angle-left fa-3x icon-back"></i>
     </div>
+    <!-- 封面 -->
     <h1 class="title">{{ title }}</h1>
     <div class="bg-image" :style="bgStyle" ref="bgImage">
       <div class="mask"></div>
@@ -13,14 +15,15 @@
         </div>
       </div>
     </div>
-    <!-- 上拉时的背景层 -->
+    <!-- 上拉时的黑色背景层 -->
     <div class="bg-layer" ref="bgLayer"></div>
+    <!-- 歌曲列表 -->
     <scroll class="scroll"
-    :data="songs"
-    ref="scroll"
-    :probe-type="3"
-    :listenScroll="true"
-    @scroll="scroll">
+      :data="songs"
+      ref="scroll"
+      :probe-type="3"
+      :listenScroll="true"
+      @scroll="scroll">
       <div class="scroll-wrapper">
         <song-list :songs="songs" @select="selectItem"></song-list>
       </div>
@@ -38,10 +41,12 @@ import SongList from '@/base/song-list/song-list';
 import prefixStyle from '@/common/js/prefix'; // 前缀判断
 import Loading from '@/base/loading/loading';
 import { mapActions } from 'vuex';
+import mixin from '@/common/js/mixin';
 
 const transform = prefixStyle('transform');
 
 export default {
+  mixins: [mixin],
   name: 'music-list',
   components: {
     Scroll,
@@ -74,6 +79,11 @@ export default {
     },
   },
   methods: {
+    handlePlayList(playList) { // 设置视图与底部之间的距离
+      const bottom = playList.length > 0 ? '1.2rem' : '';
+      this.$refs.scroll.$el.style.bottom = bottom;
+      this.$refs.scroll.refresh();
+    },
     back() {
       this.$router.back();
     },
@@ -123,9 +133,6 @@ export default {
   mounted() {
     // 控制scroll位置
     this.$refs.scroll.$el.style.top = `${this.$refs.bgImage.clientHeight}px`;
-    window.addEventListener('resize', () => {
-      this.$refs.scroll.$el.style.top = `${this.$refs.bgImage.clientHeight}px`;
-    });
   },
 };
 </script>

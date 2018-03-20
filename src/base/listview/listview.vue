@@ -75,6 +75,9 @@ export default {
     },
   },
   methods: {
+    refresh() { // 这个方法是给父组件调用的
+      this.$refs.scroll.refresh();
+    },
     jump(e) {
       const index = e.target.dataset.flag;
       this.scrollToElement(this.$refs.groups[index]);

@@ -1,6 +1,6 @@
 <template>
-  <article class="recommend">
-    <!-- scroll作为wrapper容器的包裹层, :data监听数据变化来刷新scroll高度 -->
+  <article class="recommend" ref="recommend">
+    <!-- scroll作为slider-wrapper容器的包裹层, :data监听数据变化来刷新scroll高度 -->
     <scroll class="scroll" ref="scroll" :data="recommends">
       <!-- scroll-conetnt作为wrapper容器 -->
       <div class="scroll-content">
@@ -50,8 +50,10 @@ import api from '@/api/api';
 import Slider from '@/base/slider/slider2';
 import Loading from '@/base/loading/loading';
 import Scroll from '@/base/scroll/scroll';
+import mixin from '@/common/js/mixin';
 
 export default {
+  mixins: [mixin], // 混入
   name: 'recommend',
   components: {
     Slider,
@@ -74,6 +76,11 @@ export default {
     },
   },
   methods: {
+    handlePlayList(playList) { // 设置视图与底部之间的距离
+      const bottom = playList.length > 0 ? '1.2rem' : '';
+      this.$refs.recommend.style.bottom = bottom;
+      this.$refs.scroll.refresh();
+    },
     getBanner() {
       this.axios.get(api.banner)
         .then((res) => {
