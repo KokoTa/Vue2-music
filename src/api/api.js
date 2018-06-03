@@ -5,6 +5,7 @@ const api = {
   singerSongs: '/api/artists?id=', // 歌手歌曲信息集合（没有歌曲连接）
   songInfo: '/api/music/url?id=', // 歌曲连接
   lyric: '/api/lyric?id=', // 歌词
+  getRecommendDetail: '/api/playlist/detail?id=', // 获取歌单详情
 };
 
 export default api;

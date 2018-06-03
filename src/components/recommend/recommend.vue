@@ -1,10 +1,9 @@
 <template>
   <article class="recommend" ref="recommend">
-    <!-- scroll作为slider-wrapper容器的包裹层, :data监听数据变化来刷新scroll高度 -->
+    <!-- :data监听数据变化来刷新scroll高度 -->
     <scroll class="scroll" ref="scroll" :data="recommends">
-      <!-- scroll-conetnt作为wrapper容器 -->
       <div class="scroll-content">
-        <!-- swiper -->
+        <!-- swiper方法的轮播，笨重 -->
         <!-- swiper不要用v-lazy加载，会产生样式错位，原因未知 -->
         <!-- <slider :sliderUpdate="sliderUpdate">
           <div class="swiper-slide"
@@ -13,7 +12,7 @@
             <img class="banner-img" :src="item.pic" alt="#">
           </div>
         </slider> -->
-        <!-- better-scroll -->
+        <!-- better-scroll方法的轮播，精简 -->
         <div v-if="banners.length" class="slider-wrapper">
           <slider :data="banners">
             <div v-for="(item, index) in banners" :key="index">
@@ -22,12 +21,14 @@
             </div>
           </slider>
         </div>
+        <!-- 歌单推荐列表 -->
         <div class="recommend-list">
           <h1>歌单推荐</h1>
           <ul class="list-content">
             <li class="list-item"
               v-for="(item, index) in recommends"
-              :key="index">
+              :key="index"
+              @click="selectRecommend(item)">
               <div class="item-icon">
                 <img v-lazy="item.coverImgUrl" alt="#">
               </div>
@@ -41,6 +42,7 @@
       </div>
     </scroll>
     <loading v-show="loading"></loading>
+    <router-view></router-view>
   </article>
 </template>
 
@@ -63,7 +65,7 @@ export default {
   data() {
     return {
       banners: [],
-      sliderUpdate: false, // 这个值用于swiper的走马灯中
+      // sliderUpdate: false, // 这个值用于swiper的走马灯中
       recommends: [],
     };
   },
@@ -76,7 +78,7 @@ export default {
     },
   },
   methods: {
-    handlePlayList(playList) { // 设置视图与底部之间的距离
+    handlePlayList(playList) { // 有迷你播放器时，设置视图与底部之间的距离
       const bottom = playList.length > 0 ? '1.2rem' : '';
       this.$refs.recommend.style.bottom = bottom;
       this.$refs.scroll.refresh();
@@ -86,7 +88,7 @@ export default {
         .then((res) => {
           if (res.data.code === 200) {
             this.banners = res.data.banners;
-            this.sliderUpdate = true;
+            // this.sliderUpdate = true;
           }
         });
     },
@@ -100,6 +102,9 @@ export default {
             });
           }
         });
+    },
+    selectRecommend(item) { // 选择某个歌单
+      this.$router.push(`/recommend/${item.id}`);
     },
   },
   created() {

@@ -75,7 +75,7 @@ export default {
     },
   },
   methods: {
-    refresh() { // 这个方法是给父组件调用的
+    refresh() { // 这个方法是给父组件调用来更新的
       this.$refs.scroll.refresh();
     },
     jump(e) {

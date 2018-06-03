@@ -85,8 +85,8 @@ export default class Lyric {
   // 歌词跳转
   playReset() {
     const line = this.lines[this.curNum];
-    const delay = line.time - this.startStamp; // 时间差（startStamp针对的是play方法）
-    this.startStamp = line.time; // 针对完play方法后"步入正轨"，按歌词集合的时间差播放
+    const delay = line.time - this.startStamp; // 时间差
+    this.startStamp = line.time; // 赋值为当前播放行的时间，用于下一次循环计算
 
     this.timer = setTimeout(() => {
       this.callHandle(this.curNum);
@@ -105,12 +105,12 @@ export default class Lyric {
 
     this.state = PLAYING; // 执行播放
 
-    // 假设：第一句的time为1000ms，第二局为5000ms
+    // 假设：第一句的time为1000ms，第二句为5000ms
     // 情况一：自动执行（第一次执行）时找到的是第一行，时间差就是第一行的时间，1000 - 0 = 1000，这很OK
     // 情况二：暂停后执行，假设暂停时的时间为2000ms，此时的若按照情况一，时间差的计算为1000 - 2000 = -1000，这显然是错误的
-    // 因此要故意+1，赋值为后一句，来让 5000 - 3000 = 2000，这才是正确的
+    // 因此要故意+1，赋值为后一句，来让 5000 - 2000 = 3000，这个时间差才是正确的
     // 情况三：当自动执行第一句时，在1000ms内暂停，比如700ms，再开始，this.curNum直接+1跳到了第二句，显示是上不一致的
-    // 但时间差为 5000 - 700 = 4300ms，是正常的，仅仅是视图有一次错位而已
+    // 但时间差为 5000 - 700 = 4300ms，是正常的，仅仅是视图有一次错位而已，我们可以接收这种错位
     if (start === 0) {
       this.curNum = this.findCurNum(start);
     } else {

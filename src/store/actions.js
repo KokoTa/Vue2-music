@@ -6,7 +6,7 @@ import type from './mutation-type';
 
 const actions = {
   // 获得歌手 -> 获得歌手热歌信息 -> 获得歌曲播放地址 -> 返回整合后的对象（繁琐= =）
-  // 同时这个方法只针对歌手的歌曲获得，还未支持歌单或专辑的歌曲获得
+  // 歌手歌曲获取
   getSongsPlay({ state, commit }, songsInfo) {
     return Promise.all(songsInfo.map((item) => {
       const id = item.id;
@@ -22,6 +22,33 @@ const actions = {
             id,
           };
           if (res.status === 200) {
+            obj.url = res.data.data[0].url;
+          }
+          return obj;
+        });
+    })).then((res) => {
+      const songsPlay = res;
+      commit(type.SET_SONGS, songsPlay);
+      return songsPlay;
+    });
+  },
+  // 歌单歌曲获取
+  getDiscSongsPlay({ commit }, dictInfo) {
+    const tracks = dictInfo.tracks; // 歌单每首音乐的信息
+    return Promise.all(tracks.map((item) => {
+      const id = item.id;
+      return axios.get(api.songInfo + id)
+        .then((res) => {
+          const obj = {
+            singerName: item.artists[0].name,
+            singerPic: item.artists[0].img1v1Url,
+            songName: item.name,
+            alName: item.album.name,
+            alPic: item.album.picUrl,
+            url: null,
+            id: item.id,
+          };
+          if (res.data.code === 200) {
             obj.url = res.data.data[0].url;
           }
           return obj;

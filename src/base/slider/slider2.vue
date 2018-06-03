@@ -85,7 +85,7 @@ export default {
         }
       });
 
-      this.slider.on('beforeScrollStart', () => {
+      this.slider.on('beforeScrollStart', () => { // 滚动开始前清除定时器，比如设置的1000ms后滚动，但我在500ms就手动滚动时
         if (this.autoPlay) {
           clearTimeout(this.timer);
         }

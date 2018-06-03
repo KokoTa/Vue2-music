@@ -305,7 +305,7 @@ export default {
         this.currentLineNum = 0;
       });
     },
-    lyricHandle(obj) { // 每次歌词跳转就执行回调
+    lyricHandle(obj) { // 每次歌词跳转就执行回调，进行跳转操作
       // 赋值当前行，触发高亮
       this.currentLineNum = obj.curNum;
       // 当行数大于5时才允许滚动，每次滚动一句，否则固定在顶部不动
@@ -408,7 +408,6 @@ export default {
     currentSong(newSong, oldSong) {
       console.log(newSong, oldSong);
       // 插件刚开始时并没有oldSong，会报错
-      // 阻止暂停后切歌会播放歌曲
       if (oldSong && (newSong.songName === oldSong.songName)) return;
 
       // 切歌时，上一首歌的歌词还在放（歌词播放利用setTimeout），要关掉它的定时器，否则会鬼畜
