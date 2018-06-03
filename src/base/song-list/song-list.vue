@@ -5,6 +5,7 @@
       v-for="(item, index) in songs"
       :key="index"
       @click="selectItem(item, index)">
+        <div class="count">{{ index + 1 }}</div>
         <div class="content">
           <h2 class="content-header">{{ item.songName }}</h2>
           <p class="content-desc">{{ item.singerName }} - {{ item.alName }}</p>
@@ -23,10 +24,6 @@ export default {
       default() {
         return [];
       },
-      rank: {
-        type: Boolean,
-        default: false,
-      },
     },
   },
   methods: {
@@ -44,6 +41,11 @@ export default {
       color: $color-text;
       display: flex;
       height: 1.706667rem;
+      .count {
+        padding-right: 20px;
+        @include font-dpr($font-size-medium-x);
+        text-align: center;
+      }
       .content {
         overflow: hidden;
         .content-header {

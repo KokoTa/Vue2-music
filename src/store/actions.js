@@ -6,7 +6,7 @@ import type from './mutation-type';
 
 const actions = {
   // 获得歌手 -> 获得歌手热歌信息 -> 获得歌曲播放地址 -> 返回整合后的对象（繁琐= =）
-  // 歌手歌曲获取
+  // 歌手歌曲获取/排行榜歌曲获取
   getSongsPlay({ state, commit }, songsInfo) {
     return Promise.all(songsInfo.map((item) => {
       const id = item.id;

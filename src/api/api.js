@@ -6,6 +6,7 @@ const api = {
   songInfo: '/api/music/url?id=', // 歌曲连接
   lyric: '/api/lyric?id=', // 歌词
   getRecommendDetail: '/api/playlist/detail?id=', // 获取歌单详情
+  getRankData: '/api/top/list?idx=', // 获取排行榜数据(idx值范围：0 ~ 23)
 };
 
 export default api;
