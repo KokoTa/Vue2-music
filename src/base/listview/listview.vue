@@ -1,17 +1,17 @@
 <template>
   <scroll class="list-scroll"
-  :data="data"
-  ref="scroll"
-  :listen-scroll="true"
-  @scroll="scroll"
-  :probe-type="3">
+    :data="data"
+    ref="scroll"
+    :listen-scroll="true"
+    @scroll="scroll"
+    :probe-type="3">
     <!-- 分组 -->
     <ul>
       <li class="list-group"
-      v-for="(group, index) in data"
-      :key="index"
-      :data-flag="index"
-      ref="groups">
+        v-for="(group, index) in data"
+        :key="index"
+        :data-flag="index"
+        ref="groups">
         <h2 class="group-title">分组 - {{ index }}</h2>
         <!-- 分组里的项 -->
         <ul>
@@ -27,13 +27,13 @@
     </ul>
     <!-- 侧边栏 -->
     <ul class="list-nav"
-    @touchstart="jump"
-    @touchmove.stop.prevent="move">
+      @touchstart="jump"
+      @touchmove.stop.prevent="move">
       <li class="nav-item"
-      v-for="(item, index) in data"
-      :key="index"
-      :data-flag="index"
-      :class="{'nav-item-current': currentIndex === Number(index)}">
+        v-for="(item, index) in data"
+        :key="index"
+        :data-flag="index"
+        :class="{'nav-item-current': currentIndex === Number(index)}">
         {{ index }}
       </li>
     </ul>

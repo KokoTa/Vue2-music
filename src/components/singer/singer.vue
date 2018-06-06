@@ -43,7 +43,7 @@ export default {
       .then((res) => {
         // 数据分组
         if (res.data.code === 200) {
-          const data = res.data.list.artists;
+          const data = res.data.artists;
           const num = 10;
           const divide = data.length / num;
           for (let i = 0; i < divide; i += 1) {

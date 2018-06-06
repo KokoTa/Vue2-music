@@ -40,12 +40,12 @@ const actions = {
       return axios.get(api.songInfo + id)
         .then((res) => {
           const obj = {
-            singerName: item.artists[0].name,
-            singerPic: item.artists[0].img1v1Url,
+            singerName: item.ar[0].name,
+            singerPic: '',
             songName: item.name,
-            alName: item.album.name,
-            alPic: item.album.picUrl,
-            url: null,
+            alName: item.al.name,
+            alPic: item.al.picUrl,
+            url: '',
             id: item.id,
           };
           if (res.data.code === 200) {
@@ -89,6 +89,49 @@ const actions = {
     commit(type.SET_CURRENT_INDEX, 0); // 设置歌曲索引
     commit(type.SET_FULL_SCREEN, true); // 设置是否全屏
     commit(type.SET_PLAYING_STATE, true); // 设置播放/暂停
+  },
+  // 插入歌曲并播放
+  insertPlay({ state, commit }, song) {
+    // 得到歌曲播放地址
+    axios.get(api.songInfo + song.id)
+      .then((res) => {
+        const playList = state.playList.slice(); // 新建副本
+        const sequenceList = state.sequenceList.slice(); // 新建副本
+        let currentIndex = state.currentIndex;
+        // 初始化歌曲信息
+        const obj = {
+          singerName: song.artists[0].name,
+          singerPic: song.artists[0].img1v1Url,
+          songName: song.name,
+          alName: song.album.name,
+          alPic: 'https://picsum.photos/400/400',
+          url: '',
+          id: song.id,
+        };
+        if (res.data.code === 200) {
+          obj.url = res.data.data[0].url;
+        }
+        // 播放列表中是否存在将要插入的歌曲
+        const index = playList.findIndex((item) => {
+          const b = item.songName === obj.songName;
+          return b;
+        });
+        // 如果存在，就把它移到最后面；如果不存在就把这首歌加在最后面
+        if (index > -1) {
+          playList.splice(index, 1);
+        } else {
+          sequenceList.push(obj);
+        }
+        playList.push(obj);
+        currentIndex = playList.length - 1;
+        // 播放音乐
+        commit(type.SET_PLAY_MODE, playMode.random); // 设置播放模式
+        commit(type.SET_SEQUENCELIST, sequenceList); // 设置顺序列表
+        commit(type.SET_PLAYLIST, playList); // 设置播放列表
+        commit(type.SET_CURRENT_INDEX, currentIndex); // 设置歌曲索引
+        commit(type.SET_FULL_SCREEN, true); // 设置是否全屏
+        commit(type.SET_PLAYING_STATE, true); // 设置播放/暂停
+      });
   },
 };
 

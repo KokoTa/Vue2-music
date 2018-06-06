@@ -30,7 +30,7 @@ export default {
       this.axios.get(api.getRecommendDetail + this.$route.params.id)
         .then((res) => {
           if (res.data.code === 200) {
-            this.disc = res.data.result;
+            this.disc = res.data.playlist;
             this.getDiscSongsPlay(this.disc); // 获取音乐播放地址
           }
         });

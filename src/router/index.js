@@ -7,6 +7,7 @@ const Singer = () => import('@/components/singer/singer'); // 歌手列表
 const SingerDetail = () => import('@/components/singer-detail/singer-detail'); // 歌手详情
 const Rank = () => import('@/components/rank/rank'); // 排行榜
 const RankDetail = () => import('@/components/rank-detail/rank-detail'); // 排行榜详情
+const Search = () => import('@/components/search/search'); // 搜索页
 
 Vue.use(Router);
 
@@ -48,6 +49,11 @@ export default new Router({
           component: RankDetail,
         },
       ],
+    },
+    {
+      path: '/search',
+      name: 'Search',
+      component: Search,
     },
   ],
 });
