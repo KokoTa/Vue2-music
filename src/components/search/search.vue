@@ -13,8 +13,8 @@
         </span>
       </div>
     </div>
-    <div class="search-detail" v-show="searchInfo">
-      <search-result :searchInfo="searchInfo"></search-result>
+    <div class="search-detail" v-show="searchInfo" ref="searchDetail">
+      <search-result :searchInfo="searchInfo" @blurSearchBox="getBlurOrder"></search-result>
     </div>
   </div>
 </template>
@@ -23,9 +23,11 @@
 import api from '@/api/api';
 import SearchBox from '@/base/search-box/search-box';
 import SearchResult from '@/base/search-result/search-result';
+import mixin from '@/common/js/mixin';
 
 // 点击歌手 -> 触发selectSinger事件 -> 触发search事件
 export default {
+  mixins: [mixin],
   name: 'search',
   components: {
     SearchBox,
@@ -38,6 +40,10 @@ export default {
     };
   },
   methods: {
+    handlePlayList(playList) { // 有迷你播放器时，设置视图与底部之间的距离
+      const bottom = playList.length > 0 ? '1.6rem' : '';
+      this.$refs.searchDetail.style.bottom = bottom;
+    },
     search(info) { // 改变搜索信息
       // 改变信息后触发search-result的请求事件
       this.searchInfo = info;
@@ -53,6 +59,11 @@ export default {
     selectSinger(item) { // 选择热门歌手
       // 调用search-box组件里的方法
       this.$refs.searchBox.setSearchInfo(item.name);
+    },
+    getBlurOrder(boolean) { // 获得清除焦点命令
+      if (boolean) {
+        this.$refs.searchBox.blurInput();
+      }
     },
   },
   created() {

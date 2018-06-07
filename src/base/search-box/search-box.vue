@@ -6,7 +6,8 @@
       class="search-input"
       type="text"
       v-model.trim="searchInfo"
-      :placeholder="placeholder">
+      :placeholder="placeholder"
+      ref="searchInput">
     <i
       class="icon"
       :class="{ 'fas fa-times fa-lg': searchInfo }"
@@ -35,6 +36,9 @@ export default {
     },
     setSearchInfo(info) { // 设置搜索信息
       this.searchInfo = info;
+    },
+    blurInput() { // 使 input 失去焦点，防止手机键盘出现
+      this.$refs.searchInput.blur();
     },
   },
   created() {

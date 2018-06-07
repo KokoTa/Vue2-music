@@ -1,5 +1,5 @@
 <template>
-  <div class="search-result" ref="list">
+  <div class="search-result" ref="list" @scroll="blurSearchBox()">
     <div class="content">
       <ul v-if="songs.length">
         <li
@@ -71,6 +71,21 @@ export default {
         }, delay);
       };
     },
+    blurSearchBox() { // 滚动时使search-box组件焦点清除，关闭手机端默认的键盘
+      this.$emit('blurSearchBox', true);
+    },
+  },
+  created() {
+    this.$watch('searchInfo', this.debounceFunction((info) => { // 写法原因见下
+      this.songs = [];
+      const url = `${api.search}${info}&limit=${this.limit}&type=${this.type}&offset=${this.offset}`;
+      this.axios.get(url)
+        .then((res) => {
+          if (res.data.code === 200) {
+            this.songs = res.data.result.songs;
+          }
+        });
+    }, 1000));
   },
   mounted() { // 下拉加载功能
     const list = this.$refs.list;
@@ -103,7 +118,10 @@ export default {
   // watch: {
   //   searchInfo(info) { // 搜索
   //     this.songs = [];
-  //     const url = `${api.search}${info}&limit=${this.limit}&type=${this.type}&offset=${this.offset}`;
+  //     const url = `${api.search}${info}
+  //                  &limit=${this.limit}
+  //                  &type=${this.type}
+  //                  &offset=${this.offset}`;
   //     this.axios.get(url)
   //       .then((res) => {
   //         if (res.data.code === 200) {
