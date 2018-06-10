@@ -1,4 +1,5 @@
 import playMode from '@/common/js/config';
+import cache from '@/common/js/cache';
 
 const state = {
   singer: {}, // 某歌手的信息
@@ -9,6 +10,7 @@ const state = {
   sequenceList: [], // 顺序播放列表（用于显示）
   mode: playMode.sequence, // 播放模式
   currentIndex: -1, // 当前播放索引
+  searchHistory: cache.getHistory(), // 搜索历史
 };
 
 export default state;

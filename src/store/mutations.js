@@ -25,6 +25,9 @@ const mutations = {
   [types.SET_CURRENT_INDEX](state, index) { // 当前歌曲索引
     state.currentIndex = index;
   },
+  [types.SET_SEARCH_HISTORY](state, history) { // 当前歌曲索引
+    state.searchHistory = history;
+  },
 };
 
 export default mutations;

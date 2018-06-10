@@ -58,6 +58,7 @@ export default {
     ...mapActions(['insertPlay']),
     selectSong(song) { // 选择歌曲后插入播放列表并播放
       this.insertPlay(song);
+      this.$emit('selectSong', song);
     },
     debounceFunction(func, delay) { // 搜索事件节流：每次触发就延迟执行
       let timer = null;
