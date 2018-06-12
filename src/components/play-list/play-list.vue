@@ -17,8 +17,12 @@
             @click="selectItem(item)">
             <i class="item item-playing" v-show="isPlaying(item)">playing</i>
             <span class="item-name">{{ item.songName }} - {{ item.singerName }}</span>
-            <i class="item far fa-heart"></i>
-            <i class="item" @click="deleteOne(item)">X</i>
+            <i
+              class="item fa-heart"
+              :class="favoriteIcon(item)"
+              @click.stop="setFavorite(item)">
+            </i>
+            <i class="item" @click.stop="deleteOne(item)">X</i>
           </li>
         </ul>
       </div>
@@ -30,8 +34,10 @@
 import playMode from '@/common/js/config'; // 播放模式
 import { mapGetters, mapMutations, mapActions } from 'vuex';
 import shuffle from '@/common/js/shuffle';
+import mixin from '@/common/js/mixin';
 
 export default {
+  mixins: [mixin],
   name: 'play-list',
   computed: {
     ...mapGetters(['mode', 'playList', 'currentIndex', 'sequenceList']),

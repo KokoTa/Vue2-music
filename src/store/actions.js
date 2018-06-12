@@ -59,7 +59,7 @@ const actions = {
       return songsPlay;
     });
   },
-  // 设置播放器参数
+  // 设置播放器参数(用在music-list组件)
   setPlayInfo({ commit, state }, { list, index }) {
     commit(type.SET_SEQUENCELIST, list); // 设置顺序列表
 
@@ -100,10 +100,10 @@ const actions = {
         let currentIndex = state.currentIndex;
         // 初始化歌曲信息
         const obj = {
-          singerName: song.artists[0].name,
-          singerPic: song.artists[0].img1v1Url,
+          singerName: song.artists ? song.artists[0].name : song.singer,
+          singerPic: song.artists ? song.artists[0].img1v1Url : '',
           songName: song.name,
-          alName: song.album.name,
+          alName: song.album ? song.album.name : '',
           alPic: 'https://picsum.photos/400/400',
           url: '',
           id: song.id,

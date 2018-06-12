@@ -11,6 +11,7 @@ const state = {
   mode: playMode.sequence, // 播放模式
   currentIndex: -1, // 当前播放索引
   searchHistory: cache.getHistory(), // 搜索历史
+  favoriteSongs: cache.getHistory('favoriteSongs'), // 我喜欢的歌曲
 };
 
 export default state;

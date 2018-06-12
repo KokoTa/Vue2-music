@@ -8,6 +8,7 @@ const SingerDetail = () => import('@/components/singer-detail/singer-detail'); /
 const Rank = () => import('@/components/rank/rank'); // 排行榜
 const RankDetail = () => import('@/components/rank-detail/rank-detail'); // 排行榜详情
 const Search = () => import('@/components/search/search'); // 搜索页
+const User = () => import('@/components/user/user'); // 用户页
 
 Vue.use(Router);
 
@@ -54,6 +55,11 @@ export default new Router({
       path: '/search',
       name: 'Search',
       component: Search,
+    },
+    {
+      path: '/user',
+      name: 'User',
+      component: User,
     },
   ],
 });

@@ -76,7 +76,11 @@
               <i @click="nextSong" class="fas fa-forward fa-2x"></i>
             </div>
             <div class="icon left">
-              <i class="far fa-heart fa-2x"></i>
+              <i
+                class="fa-heart fa-2x"
+                :class="favoriteIcon(currentSong)"
+                @click="setFavorite(currentSong)">
+              </i>
             </div>
           </div>
         </div>
@@ -123,12 +127,14 @@ import getLyric from '@/common/js/getLyric'; // 获取歌词
 import Lyric from '@/common/js/lyricParse'; // 解析歌词
 import Scroll from '@/base/scroll/scroll';
 import prefixStyle from '@/common/js/prefix';
+import mixin from '@/common/js/mixin';
 import PlayList from '../play-list/play-list'; // 播放列表组件
 
 const transform = prefixStyle('transform');
 const transitionDuration = prefixStyle('transitionDuration');
 
 export default {
+  mixins: [mixin],
   name: 'player',
   components: {
     ProgressBar,

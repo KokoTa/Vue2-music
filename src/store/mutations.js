@@ -28,6 +28,9 @@ const mutations = {
   [types.SET_SEARCH_HISTORY](state, history) { // 当前歌曲索引
     state.searchHistory = history;
   },
+  [types.SET_FAVORITE_SONG](state, list) { // 当前歌曲索引
+    state.favoriteSongs = list;
+  },
 };
 
 export default mutations;

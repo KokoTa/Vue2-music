@@ -29,6 +29,9 @@ const getters = {
   searchHistory(state) {
     return state.searchHistory;
   },
+  favoriteSongs(state) {
+    return state.favoriteSongs;
+  },
 };
 
 export default getters;
