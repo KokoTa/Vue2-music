@@ -9,6 +9,11 @@ function setHistory(song) {
   const songs = localStorage.getItem('songs');
   if (songs) {
     const songList = JSON.parse(songs);
+
+    // 是否存在相同历史信息，存在就不添加
+    const exist = songList.some(item => item.id === obj.id);
+    if (exist) return;
+
     songList.unshift(obj); // 添加到头部
     // 搜索历史不超过 15 条，超过就删除
     if (songList.length > 15) {

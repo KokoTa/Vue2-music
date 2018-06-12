@@ -133,6 +133,45 @@ const actions = {
         commit(type.SET_PLAYING_STATE, true); // 设置播放/暂停
       });
   },
+  // 删除一首歌
+  deletePlay({ state, commit }, song) {
+    const playList = state.playList.slice(); // 新建副本
+    const sequenceList = state.sequenceList.slice(); // 新建副本
+    let currentIndex = state.currentIndex;
+
+    const playListIndex = playList.findIndex(item => item.id === song.id); // 找到播放列表里这首歌的索引
+    playList.splice(playListIndex, 1); // 删除
+    const sequenceListIndex = sequenceList.findIndex(item => item.id === song.id); // 找到顺序列表里这首歌的索引
+    sequenceList.splice(sequenceListIndex, 1); // 删除
+
+    if (playListIndex <= currentIndex) { // 删除的索引小于当前播放索引时
+      currentIndex -= 1;
+    }
+    if (currentIndex === -1) {
+      currentIndex = 0;
+    }
+
+    commit(type.SET_SEQUENCELIST, sequenceList); // 设置顺序列表
+    commit(type.SET_PLAYLIST, playList); // 设置播放列表
+    commit(type.SET_CURRENT_INDEX, currentIndex); // 设置歌曲索引
+
+    if (!playList.length) { // 播放列表为空时
+      commit(type.SET_PLAYING_STATE, false); // 设置播放/暂停
+    }
+  },
+  // 删除所有歌曲
+  deleteAllPlay({ commit }) {
+    commit(type.SET_SEQUENCELIST, []); // 设置顺序列表
+    commit(type.SET_PLAYLIST, []); // 设置播放列表
+    commit(type.SET_CURRENT_INDEX, -1); // 设置歌曲索引
+  },
+  // 播放某首歌曲
+  playOneSong({ state, commit }, song) {
+    const index = state.playList.findIndex(item => item.id === song.id);
+    if (index) {
+      commit(type.SET_CURRENT_INDEX, index);
+    }
+  },
 };
 
 export default actions;

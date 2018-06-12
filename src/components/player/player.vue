@@ -98,15 +98,18 @@
           </progress-circle>
         </div>
         <div class="control">
-          <i class="fas fa-music fa-2x"></i>
+          <i class="fas fa-music fa-2x" @click.stop="openPlayList"></i>
         </div>
       </div>
     </transition>
     <!-- 播放器 -->
     <audio :src="currentSong.url"
-    ref="audio"
-    @timeupdate="timeUpdate"
-    @ended="songEnd"></audio>
+      ref="audio"
+      @timeupdate="timeUpdate"
+      @ended="songEnd">
+    </audio>
+    <!-- 播放列表 -->
+    <play-list ref="playList"></play-list>
   </div>
 </template>
 
@@ -120,6 +123,7 @@ import getLyric from '@/common/js/getLyric'; // 获取歌词
 import Lyric from '@/common/js/lyricParse'; // 解析歌词
 import Scroll from '@/base/scroll/scroll';
 import prefixStyle from '@/common/js/prefix';
+import PlayList from '../play-list/play-list'; // 播放列表组件
 
 const transform = prefixStyle('transform');
 const transitionDuration = prefixStyle('transitionDuration');
@@ -130,6 +134,7 @@ export default {
     ProgressBar,
     ProgressCircle,
     Scroll,
+    PlayList,
   },
   computed: {
     ...mapGetters([
@@ -271,7 +276,7 @@ export default {
       this.resetCurrentIndex(list);
       this.SET_PLAYLIST(list);
     },
-    resetCurrentIndex(list) { // 更新索引
+    resetCurrentIndex(list) { // 更新新播放列表下当前歌曲的索引
       const index = list.findIndex((item) => {
         const b = item.songName === this.currentSong.songName;
         return b;
@@ -306,6 +311,10 @@ export default {
       });
     },
     lyricHandle(obj) { // 每次歌词跳转就执行回调，进行跳转操作
+      // 这个判断涉及到play-list组件，当列表为空时会报无DOM的错误
+      // PS：列表为空时，由于是v-if，此时player组件就不存在了，但于此同时lyric中的setTimeout定时器还会延迟执行一次
+      // 所以这个判断就是用来处理这种情况的
+      if (!this.$refs.middleRight) return;
       // 赋值当前行，触发高亮
       this.currentLineNum = obj.curNum;
       // 当行数大于5时才允许滚动，每次滚动一句，否则固定在顶部不动
@@ -396,6 +405,10 @@ export default {
 
       return true;
     },
+    // 打开播放列表
+    openPlayList() {
+      this.$refs.playList.open();
+    },
     ...mapMutations([
       'SET_FULL_SCREEN',
       'SET_PLAYING_STATE',
@@ -407,7 +420,10 @@ export default {
   watch: {
     currentSong(newSong, oldSong) {
       console.log(newSong, oldSong);
-      // 插件刚开始时并没有oldSong，会报错
+      // 删除播放列表后，没有newSong，无需后续操作
+      if (!newSong) return;
+
+      // 插件刚开始时并没有oldSong，所以要先判断有没有oldSong
       if (oldSong && (newSong.songName === oldSong.songName)) return;
 
       // 切歌时，上一首歌的歌词还在放（歌词播放利用setTimeout），要关掉它的定时器，否则会鬼畜
